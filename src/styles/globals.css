@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    font-family:
+      "Pretendard Variable",
+      Pretendard,
+      "Apple SD Gothic Neo",
+      "Malgun Gothic",
+      system-ui,
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss03";
+  }
+  /* 모바일 기본 글자 크기 16px 이상 보장 */
+  body {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  /* iOS 입력 확대 방지 */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+  /* 포커스 가시성 */
+  :focus-visible {
+    outline: 2px solid theme("colors.ocean.500");
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

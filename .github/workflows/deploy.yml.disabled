@@ -1,0 +1,63 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 같은 워크플로우 중복 실행 방지 (최신만 적용)
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (with /sydney-family-trip/ base)
+        env:
+          # gh-pages sub-path
+          BASE: /sydney-family-trip/
+          # 호텔 PII (Settings → Secrets and variables → Actions 에 등록)
+          VITE_HOTEL_GUEST_NAME: ${{ secrets.VITE_HOTEL_GUEST_NAME }}
+          VITE_HOTEL_MEMBER_ID: ${{ secrets.VITE_HOTEL_MEMBER_ID }}
+          VITE_HOTEL_AGODA_BOOKING_ID: ${{ secrets.VITE_HOTEL_AGODA_BOOKING_ID }}
+          VITE_HOTEL_REFERENCE_NO: ${{ secrets.VITE_HOTEL_REFERENCE_NO }}
+          VITE_HOTEL_TOTAL_AMOUNT: ${{ secrets.VITE_HOTEL_TOTAL_AMOUNT }}
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
